@@ -6,12 +6,12 @@ A directory picker for Telescope like dir-telescope but opens Oil.nvim when a di
 - [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
-	{
-		"albenisolmos/telescope-oil.nvim",
-		config = function()
-			require("telescope").load_extension("oil")
-		end
-	},
+    {
+        "albenisolmos/telescope-oil.nvim",
+        config = function()
+            require("telescope").load_extension("oil")
+        end
+    },
 ```
 
 ## Usage
