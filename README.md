@@ -1,7 +1,9 @@
 # telescope-oil.nvim
 A directory picker for Telescope like dir-telescope but opens Oil.nvim when a directory is selected
 
-https://github.com/albenisolmos/telescope-oil.nvim/assets/43548660/bb10f6dd-4d4b-4795-9eba-e68b40f7081e
+
+https://github.com/albenisolmos/telescope-oil.nvim/assets/43548660/be5ea63d-0b8c-4f9b-9b4e-406f7a9f3747
+
 
 ## Installation
 
