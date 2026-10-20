@@ -85,39 +85,46 @@ M.get_dirs = function(opts, fn)
 	vim.fn.jobstart(find_command, {
 		stdout_buffered = true,
 		on_stdout = function(_, data)
-			if data then
-				opts = vim.tbl_deep_extend("force", theme_opts, opts or {})
-				pickers
-					.new(opts, {
-						prompt_title = "Select a Directory",
-						finder = finders.new_table({ results = data, entry_maker = make_entry.gen_from_file(opts) }),
-						previewer = getPreviewer(),
-						sorter = conf.file_sorter(opts),
-						attach_mappings = function(prompt_bufnr)
-							action_set.select:replace(function()
-								local current_picker = action_state.get_current_picker(prompt_bufnr)
-								local dirs = {}
-								local selections = current_picker:get_multi_selection()
-								if vim.tbl_isempty(selections) then
-									table.insert(dirs, action_state.get_selected_entry().value)
-								else
-									for _, selection in ipairs(selections) do
-										table.insert(dirs, selection.value)
-									end
+			opts = vim.tbl_deep_extend("force", theme_opts, opts or {})
+			pickers
+				.new(opts, {
+					prompt_title = "Select a Directory",
+					finder = finders.new_table({
+						-- buffered output ends with an empty string after the final newline
+						results = vim.tbl_filter(function(dir)
+							return dir ~= ""
+						end, data),
+						entry_maker = make_entry.gen_from_file(opts),
+					}),
+					previewer = getPreviewer(),
+					sorter = conf.file_sorter(opts),
+					attach_mappings = function(prompt_bufnr)
+						action_set.select:replace(function()
+							local current_picker = action_state.get_current_picker(prompt_bufnr)
+							local dirs = {}
+							local selections = current_picker:get_multi_selection()
+							if vim.tbl_isempty(selections) then
+								local entry = action_state.get_selected_entry()
+								if not entry then
+									vim.notify("telescope-oil: Nothing currently selected", vim.log.levels.WARN)
+									return
 								end
-								actions._close(prompt_bufnr, current_picker.initial_mode == "insert")
-								fn(dirs[1])
-							end)
-							return true
-						end,
-					})
-					:find()
+								table.insert(dirs, entry.value)
+							else
+								for _, selection in ipairs(selections) do
+									table.insert(dirs, selection.value)
+								end
+							end
+							actions._close(prompt_bufnr, current_picker.initial_mode == "insert")
+							fn(dirs[1])
+						end)
+						return true
+					end,
+				})
+				:find()
 
-				if opts.debug then
-					print("get_dirs took " .. time.time_end("get_dirs") .. " seconds")
-				end
-			else
-				vim.notify("No directories found", vim.log.levels.ERROR)
+			if opts.debug then
+				print("get_dirs took " .. time.time_end("get_dirs") .. " seconds")
 			end
 		end,
 	})
